@@ -1,4 +1,2 @@
 # LearningRecord
-Welcome to my repository,I will share my learning experience here.
-# catalogue
-updating ~
+This is a React Web frame build myself.
