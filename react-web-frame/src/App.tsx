@@ -3,7 +3,7 @@ import './App.css';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Login } from './pages/login';
 import { Main } from './pages/main';
-import { NotFound } from './pages/NotFound';
+import { NotFound } from './pages/errorPage/404';
 
 const App: FC = () => {
   return (
@@ -12,7 +12,7 @@ const App: FC = () => {
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />}/>
         <Route path="/main" element={<Main />} />
-        <Route path="*" element={<NotFound />}/>
+        <Route path="/404" element={<NotFound />}/>
       </Routes>
     </div>
   );
