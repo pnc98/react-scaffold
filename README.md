@@ -1,2 +1,2 @@
-# LearningRecord
-This is a React Web frame build myself.
+# react-web-scaffold
+This is a React Web scaffold build myself.
