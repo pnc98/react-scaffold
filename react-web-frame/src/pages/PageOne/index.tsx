@@ -1,15 +1,17 @@
 import { Button } from "@material-ui/core";
 import { FC } from "react";
-import { fromFetch } from 'rxjs/fetch';
+import { getExampleApi, postExampleApi } from "../../core/service/api/exampleApi";
 
 export const PageOne: FC = () => {
-  const test = () => {
-    const data$ = fromFetch('/api/userloginin', { 
-      method: "post", 
-      headers: { "Content-Type": "application/json;charset=UTF-8" }, 
-      body: JSON.stringify({ userId: "wrq", password: "123"}) 
+  const testPOST = () => {
+    const data$ = postExampleApi({ userId: "wrq", password: "123"})
+    data$.subscribe({
+      next: result => console.log(result),
+      complete: () => console.log('done')
     })
-    .pipe()
+  };
+  const testGET = () => {
+    const data$ = getExampleApi({imgUrl: "1_1656301386800.Png", id: "1"})
     data$.subscribe({
       next: result => console.log(result),
       complete: () => console.log('done')
@@ -18,7 +20,8 @@ export const PageOne: FC = () => {
   return (
     <div>
       PageOne
-      <Button onClick={test}>发送请求</Button>
+      <Button variant="contained" onClick={testPOST}>发送POST请求</Button>
+      <Button variant="contained" onClick={testGET}>发送GET请求</Button>
     </div>
   )
 };

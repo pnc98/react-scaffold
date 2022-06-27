@@ -1,15 +1,22 @@
 import { FC, useEffect, useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
-import { AppBar, Box, Button, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from "@mui/material";
+import { Box, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, styled, ThemeProvider, Toolbar, Typography } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
-import Brightness5OutlinedIcon from '@mui/icons-material/Brightness5Outlined';
-import Brightness3OutlinedIcon from '@mui/icons-material/Brightness3Outlined';
 import DesktopWindowsOutlinedIcon from '@mui/icons-material/DesktopWindowsOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import mainStyle from "./style/index.module.scss";
 import { Outlet, useNavigate} from "react-router-dom";
 import { MenuListDataModels } from "./models";
+import { lightTheme, darkTheme } from "../../assets/themeColor";
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import Brightness5RoundedIcon from '@mui/icons-material/Brightness5Rounded';
+import Brightness2RoundedIcon from '@mui/icons-material/Brightness2Rounded';
 
+interface AppBarProps extends MuiAppBarProps {
+  open?: boolean;
+}
+const drawerWidth = 200;
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
@@ -18,19 +25,74 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
   },
   drawer: {
-    width: 240,
     '& .MuiDrawer-paper': {
-      width: 240,
+      width: drawerWidth,
       boxSizing: 'border-box',
+      boxShadow: '0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)'
     },
   },
-  content: {
-    flex: 1,
-  }
+}));
+const MainContent = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
+  open?: boolean;
+}>(({ theme, open }) => ({
+  flexGrow: 1,
+  paddingTop: "64px",
+  transition: theme.transitions.create('margin', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  marginLeft: 0,
+  background:  theme.palette.secondary.main,
+  color: theme.palette.secondary.contrastText,
+  ...(open && {
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    marginLeft: `${drawerWidth}px`,
+  }),
+}));
+const AppBar = styled(MuiAppBar, {
+    shouldForwardProp: (prop) => prop !== 'open',
+})<AppBarProps>(({ theme, open }) => ({
+    transition: theme.transitions.create(['margin', 'width'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: `${drawerWidth}px`,
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
+const CustomDrawer = styled(Drawer)(({ theme }) => ({
+  '& .MuiDrawer-paper': {
+    background: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText
+  },
+}));
+const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: theme.spacing(0, 1),
+  ...theme.mixins.toolbar,
+  justifyContent: 'flex-end',
+}));
+const CustomDesktopWindowsOutlinedIcon = styled(DesktopWindowsOutlinedIcon)(({ theme }) => ({
+  color: theme.palette.primary.contrastText
+}));
+const CustomSettingsOutlinedIcon = styled(SettingsOutlinedIcon)(({ theme }) => ({
+  color: theme.palette.primary.contrastText
+}));
+const CustomChevronLeftIcon = styled(ChevronLeftIcon)(({ theme }) => ({
+  color: theme.palette.primary.contrastText
 }));
 const routeList: MenuListDataModels[] = [
-  { key: "pageOne", path: "pageOne", pageName: "页面一", icon: <DesktopWindowsOutlinedIcon sx={{ color: "#000"}}/> },
-  { key: "pageTwo", path: "pageTwo", pageName: "页面二", icon:  <SettingsOutlinedIcon sx={{ color: "#000" }}/>}
+  { key: "pageOne", path: "pageOne", pageName: "页面一", icon: <CustomDesktopWindowsOutlinedIcon /> },
+  { key: "pageTwo", path: "pageTwo", pageName: "页面二", icon:  <CustomSettingsOutlinedIcon />}
 ];
 export const Main: FC = () => {
   const classes = useStyles();
@@ -38,15 +100,19 @@ export const Main: FC = () => {
   const [ menuListVisible, setMenuListVisible ] = useState<boolean>(false);
   const [ activeKey, setActiveKey ] = useState<string>("");
   const [ lightThemeColor, setLightThemeColor ] = useState<boolean>(true);
-  const toggleMenuList = () => {
-    setMenuListVisible(!menuListVisible);
-  };
+
   const menuListItemClick = (url: string) => {
     setActiveKey(`/main/${url}`);
-    setMenuListVisible(!menuListVisible);
   };
   const toggleThemeColor = () => {
     setLightThemeColor(!lightThemeColor);
+  };
+  const handleMenuListItemOpen = () => {
+    setMenuListVisible(true);
+  };
+
+  const handleMenuListItemClose = () => {
+    setMenuListVisible(false);
   };
   useEffect(() => {
     if(activeKey === "") {
@@ -56,69 +122,63 @@ export const Main: FC = () => {
     };
   }, [activeKey, navigate]);
   return (
-    <div className={mainStyle.main}>
-      <Box className={classes.root}>
-        <AppBar position="static">
-          <Toolbar>
-            <IconButton
-              size="large"
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              sx={{ mr: 2 }}
-              onClick={toggleMenuList}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>Menu</Typography>
-            {
-              lightThemeColor? 
+    <ThemeProvider theme={lightThemeColor? lightTheme : darkTheme}>
+      <div className={mainStyle.main}>
+        <Box className={classes.root}>
+          <AppBar position="fixed" open={menuListVisible}>
+            <Toolbar>
+              <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                onClick={handleMenuListItemOpen}
+                sx={{ mr: 2, ...(menuListVisible && { display: 'none' }) }}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>Menu</Typography>
               <IconButton
                 size="large"
                 edge="start"
                 color="inherit"
                 onClick={toggleThemeColor}
               >
-                <Brightness5OutlinedIcon />
+                {lightThemeColor? <Brightness2RoundedIcon /> : <Brightness5RoundedIcon />}
               </IconButton>
-              :
-              <IconButton
-                size="large"
-                edge="start"
-                color="inherit"
-                onClick={toggleThemeColor}
-              >
-                <Brightness3OutlinedIcon />
+            </Toolbar>
+          </AppBar>
+          <CustomDrawer
+            variant="persistent"
+            anchor="left"
+            className={classes.drawer}
+            open={ menuListVisible }
+          >
+            <DrawerHeader>
+              <IconButton onClick={handleMenuListItemClose}>
+                <CustomChevronLeftIcon />
               </IconButton>
-            }
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          anchor="left"
-          variant="temporary"
-          className={classes.drawer}
-          open={ menuListVisible }
-          onClose={ toggleMenuList }
-        >
-          <List disablePadding>
-            {
-              routeList.map((item) => (
-              <ListItem key={item.key} disablePadding>
-                <ListItemButton onClick={() => menuListItemClick(item.path)}>
-                  <ListItemIcon>
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText primary={item.pageName} />
-                </ListItemButton>
-              </ListItem>
-              ))
-            }
-          </List>
-        </Drawer>
-        <Box className={classes.content}>
-          <Outlet />
+            </DrawerHeader>
+            <List disablePadding>
+              {
+                routeList.map((item) => (
+                <ListItem key={item.key} disablePadding>
+                  <ListItemButton onClick={() => menuListItemClick(item.path)}>
+                    <ListItemIcon>
+                      {item.icon}
+                    </ListItemIcon>
+                    <ListItemText primary={item.pageName} />
+                  </ListItemButton>
+                </ListItem>
+                ))
+              }
+            </List>
+          </CustomDrawer>
+          <MainContent open={menuListVisible}>
+            <Outlet />
+          </MainContent>
         </Box>
-      </Box>
-    </div>
+      </div>
+    </ThemeProvider>
   )
 };
