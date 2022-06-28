@@ -1,17 +1,18 @@
 import { FC, useEffect, useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, styled, ThemeProvider, Toolbar, Typography } from "@mui/material";
+import { Box, Collapse, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, styled, ThemeProvider, Toolbar, Typography } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import DesktopWindowsOutlinedIcon from '@mui/icons-material/DesktopWindowsOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import mainStyle from "./style/index.module.scss";
 import { Outlet, useNavigate} from "react-router-dom";
-import { MenuListDataModels } from "./models";
+import { MenuListDataModels } from "../../core/model/mainLayout";
 import { lightTheme, darkTheme } from "../../assets/themeColor";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import Brightness5RoundedIcon from '@mui/icons-material/Brightness5Rounded';
 import Brightness2RoundedIcon from '@mui/icons-material/Brightness2Rounded';
+import { StarBorder } from "@mui/icons-material";
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -88,6 +89,9 @@ const CustomSettingsOutlinedIcon = styled(SettingsOutlinedIcon)(({ theme }) => (
   color: theme.palette.primary.contrastText
 }));
 const CustomChevronLeftIcon = styled(ChevronLeftIcon)(({ theme }) => ({
+  color: theme.palette.primary.contrastText
+}));
+const CustomStarBorder = styled(ChevronLeftIcon)(({ theme }) => ({
   color: theme.palette.primary.contrastText
 }));
 const routeList: MenuListDataModels[] = [
@@ -172,6 +176,16 @@ export const Main: FC = () => {
                 </ListItem>
                 ))
               }
+              <Collapse in={menuListVisible} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                      <ListItemButton sx={{ pl: 4 }}>
+                        <ListItemIcon>
+                          <StarBorder />
+                        </ListItemIcon>
+                        <ListItemText primary="Starred" />
+                      </ListItemButton>
+                    </List>
+                  </Collapse>
             </List>
           </CustomDrawer>
           <MainContent open={menuListVisible}>

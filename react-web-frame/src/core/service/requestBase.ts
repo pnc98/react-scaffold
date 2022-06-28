@@ -19,4 +19,8 @@ export class RequestBase {
   build(): Request {
     return new Request(this.requestUrl, this.requestStructure);
   };
+  header(key: string, val: string) {
+    (this.requestStructure.headers as Record<string, string>)[key] = val;
+    return this;
+  };
 };
