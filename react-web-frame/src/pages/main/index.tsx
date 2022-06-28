@@ -1,22 +1,22 @@
 import { FC, useEffect, useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Collapse, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, styled, ThemeProvider, Toolbar, Typography } from "@mui/material";
+import { Box, Collapse, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, styled, ThemeProvider, Toolbar, Typography } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import DesktopWindowsOutlinedIcon from '@mui/icons-material/DesktopWindowsOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import mainStyle from "./style/index.module.scss";
 import { Outlet, useNavigate} from "react-router-dom";
-import { MenuListDataModels } from "../../core/model/mainLayout";
+import { ChildrenListOpenDefaultState, ChildrenListOpenModel, MenuListDataModels } from "../../core/model/mainLayout";
 import { lightTheme, darkTheme } from "../../assets/themeColor";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import Brightness5RoundedIcon from '@mui/icons-material/Brightness5Rounded';
 import Brightness2RoundedIcon from '@mui/icons-material/Brightness2Rounded';
-import { StarBorder } from "@mui/icons-material";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
-}
+};
 const drawerWidth = 200;
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -91,20 +91,15 @@ const CustomSettingsOutlinedIcon = styled(SettingsOutlinedIcon)(({ theme }) => (
 const CustomChevronLeftIcon = styled(ChevronLeftIcon)(({ theme }) => ({
   color: theme.palette.primary.contrastText
 }));
-const CustomStarBorder = styled(ChevronLeftIcon)(({ theme }) => ({
-  color: theme.palette.primary.contrastText
-}));
-const routeList: MenuListDataModels[] = [
-  { key: "pageOne", path: "pageOne", pageName: "页面一", icon: <CustomDesktopWindowsOutlinedIcon /> },
-  { key: "pageTwo", path: "pageTwo", pageName: "页面二", icon:  <CustomSettingsOutlinedIcon />}
-];
+
 export const Main: FC = () => {
   const classes = useStyles();
   let navigate = useNavigate();
   const [ menuListVisible, setMenuListVisible ] = useState<boolean>(false);
   const [ activeKey, setActiveKey ] = useState<string>("");
   const [ lightThemeColor, setLightThemeColor ] = useState<boolean>(true);
-
+  const [ childrenListOpen, setChildrenListOpen ] = useState<ChildrenListOpenModel>(ChildrenListOpenDefaultState);
+  
   const menuListItemClick = (url: string) => {
     setActiveKey(`/main/${url}`);
   };
@@ -114,10 +109,37 @@ export const Main: FC = () => {
   const handleMenuListItemOpen = () => {
     setMenuListVisible(true);
   };
-
   const handleMenuListItemClose = () => {
     setMenuListVisible(false);
   };
+  const test1 = () => {
+    setChildrenListOpen({...childrenListOpen, first: !childrenListOpen.first});
+  };
+  const test2 = () => {
+    setChildrenListOpen({...childrenListOpen, second: !childrenListOpen.second});
+  }; 
+  const routeList: MenuListDataModels[] = [
+    { 
+      key: "pageOne", 
+      pageName: "页面一", 
+      icon: <CustomDesktopWindowsOutlinedIcon />,
+      open: childrenListOpen.first,
+      clickParentMethod: test1,
+      children: [
+        { key: "childrenPageOne" , path: "pageOne", pageName: "子页面一", icon: <CustomDesktopWindowsOutlinedIcon />}
+      ] 
+    },
+    { 
+      key: "pageTwo", 
+      pageName: "页面二", 
+      icon:  <CustomSettingsOutlinedIcon />,
+      open: childrenListOpen.second,
+      clickParentMethod: test2,
+      children: [
+        { key: "childrenPageTwo" , path: "pageTwo", pageName: "子页面二", icon: <CustomSettingsOutlinedIcon /> }
+      ]
+    }
+  ];
   useEffect(() => {
     if(activeKey === "") {
       navigate("/main/pageOne", { replace: true });
@@ -166,26 +188,37 @@ export const Main: FC = () => {
             <List disablePadding>
               {
                 routeList.map((item) => (
-                <ListItem key={item.key} disablePadding>
-                  <ListItemButton onClick={() => menuListItemClick(item.path)}>
+                  item.children?
+                  <div key={item.key}>
+                    <ListItemButton selected={true} key={item.key} onClick={item.clickParentMethod}>
+                      <ListItemIcon>
+                        {item.icon}
+                      </ListItemIcon>
+                      <ListItemText primary={item.pageName}/>
+                      {item.open ? <ExpandLess /> : <ExpandMore />}
+                    </ListItemButton>
+                    {
+                      item.children.map((children: MenuListDataModels) => (
+                      <Collapse key={children.key} in={item.open} timeout="auto" unmountOnExit>
+                        <ListItemButton sx={{ pl: 4 }} onClick={() => menuListItemClick(children.path?? "")}>
+                          <ListItemIcon>
+                            {children.icon}
+                          </ListItemIcon>
+                          <ListItemText primary={children.pageName} />
+                        </ListItemButton>
+                      </Collapse>
+                      ))
+                    }
+                  </div>
+                  :
+                  <ListItemButton key={item.key} onClick={() => menuListItemClick(item.path?? "")}>
                     <ListItemIcon>
                       {item.icon}
                     </ListItemIcon>
                     <ListItemText primary={item.pageName} />
                   </ListItemButton>
-                </ListItem>
                 ))
               }
-              <Collapse in={menuListVisible} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                      <ListItemButton sx={{ pl: 4 }}>
-                        <ListItemIcon>
-                          <StarBorder />
-                        </ListItemIcon>
-                        <ListItemText primary="Starred" />
-                      </ListItemButton>
-                    </List>
-                  </Collapse>
             </List>
           </CustomDrawer>
           <MainContent open={menuListVisible}>
