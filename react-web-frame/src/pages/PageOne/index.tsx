@@ -17,11 +17,14 @@ export const PageOne: FC = () => {
       complete: () => console.log('done')
     })
   };
+  const test = () => {
+  };
   return (
     <div>
       PageOne
       <Button variant="contained" onClick={testPOST}>发送POST请求</Button>
       <Button variant="contained" onClick={testGET}>发送GET请求</Button>
+      <Button variant="contained" onClick={test}>测试</Button>
     </div>
   )
 };

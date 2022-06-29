@@ -7,6 +7,7 @@ import { NotFound } from './pages/errorPage/404';
 import { PageOne } from './pages/PageOne';
 import { PageTwo } from './pages/PageTwo';
 import Providers from './Provider';
+import AuthGuard from './guards/auth.guard';
 
 const App: FC = () => {
   return (
@@ -15,7 +16,12 @@ const App: FC = () => {
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="login" element={<Login />}/>
-          <Route path="main" element={<Main />} >
+          <Route path="main" 
+          element={
+            // <AuthGuard>
+              <Main />
+            // </AuthGuard>
+          }>
             <Route path="pageOne" element={<PageOne />}/>
             <Route path="pageTwo" element={<PageTwo />}/>
           </Route>
