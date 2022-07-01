@@ -1,9 +1,7 @@
 import { FC, useEffect, useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Collapse, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, styled, ThemeProvider, Toolbar, Typography } from "@mui/material";
+import { Box, Collapse, Drawer, IconButton, List, ListItemButton, ListItemText, styled, ThemeProvider, Toolbar, Typography } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
-import DesktopWindowsOutlinedIcon from '@mui/icons-material/DesktopWindowsOutlined';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import mainStyle from "./style/index.module.scss";
 import { Outlet, useNavigate} from "react-router-dom";
 import { ChildrenListOpenDefaultState, ChildrenListOpenModel, MenuListDataModels } from "../../core/model/mainLayout";
@@ -17,7 +15,7 @@ import { ExpandLess, ExpandMore } from "@mui/icons-material";
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
 };
-const drawerWidth = 200;
+const drawerWidth = 160;
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
@@ -72,7 +70,8 @@ const AppBar = styled(MuiAppBar, {
 const CustomDrawer = styled(Drawer)(({ theme }) => ({
   '& .MuiDrawer-paper': {
     background: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText
+    color: theme.palette.primary.contrastText,
+    fontSize: "14px"
   },
 }));
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -81,12 +80,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   padding: theme.spacing(0, 1),
   ...theme.mixins.toolbar,
   justifyContent: 'flex-end',
-}));
-const CustomDesktopWindowsOutlinedIcon = styled(DesktopWindowsOutlinedIcon)(({ theme }) => ({
-  color: theme.palette.primary.contrastText
-}));
-const CustomSettingsOutlinedIcon = styled(SettingsOutlinedIcon)(({ theme }) => ({
-  color: theme.palette.primary.contrastText
 }));
 const CustomChevronLeftIcon = styled(ChevronLeftIcon)(({ theme }) => ({
   color: theme.palette.primary.contrastText
@@ -122,21 +115,19 @@ export const Main: FC = () => {
     { 
       key: "pageOne", 
       pageName: "页面一", 
-      icon: <CustomDesktopWindowsOutlinedIcon />,
       open: childrenListOpen.first,
       clickParentMethod: test1,
       children: [
-        { key: "childrenPageOne" , path: "pageOne", pageName: "子页面一", icon: <CustomDesktopWindowsOutlinedIcon />}
+        { key: "childrenPageOne" , path: "pageOne", pageName: "子页面一" }
       ] 
     },
     { 
       key: "pageTwo", 
       pageName: "页面二", 
-      icon:  <CustomSettingsOutlinedIcon />,
       open: childrenListOpen.second,
       clickParentMethod: test2,
       children: [
-        { key: "childrenPageTwo" , path: "pageTwo", pageName: "子页面二", icon: <CustomSettingsOutlinedIcon /> }
+        { key: "childrenPageTwo" , path: "pageTwo", pageName: "子页面二" }
       ]
     }
   ];
@@ -191,9 +182,6 @@ export const Main: FC = () => {
                   item.children?
                   <div key={item.key}>
                     <ListItemButton selected={true} key={item.key} onClick={item.clickParentMethod}>
-                      <ListItemIcon>
-                        {item.icon}
-                      </ListItemIcon>
                       <ListItemText primary={item.pageName}/>
                       {item.open ? <ExpandLess /> : <ExpandMore />}
                     </ListItemButton>
@@ -201,9 +189,6 @@ export const Main: FC = () => {
                       item.children.map((children: MenuListDataModels) => (
                       <Collapse key={children.key} in={item.open} timeout="auto" unmountOnExit>
                         <ListItemButton sx={{ pl: 4 }} onClick={() => menuListItemClick(children.path?? "")}>
-                          <ListItemIcon>
-                            {children.icon}
-                          </ListItemIcon>
                           <ListItemText primary={children.pageName} />
                         </ListItemButton>
                       </Collapse>
@@ -212,9 +197,6 @@ export const Main: FC = () => {
                   </div>
                   :
                   <ListItemButton key={item.key} onClick={() => menuListItemClick(item.path?? "")}>
-                    <ListItemIcon>
-                      {item.icon}
-                    </ListItemIcon>
                     <ListItemText primary={item.pageName} />
                   </ListItemButton>
                 ))

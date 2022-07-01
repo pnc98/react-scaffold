@@ -2,7 +2,6 @@ export interface MenuListDataModels {
   path?: string,
   key: string,
   pageName: string,
-  icon: any,
   open?: boolean,
   clickParentMethod?: () => void,//控制子菜单打开和收起事件
   children?: MenuListDataModels[]
